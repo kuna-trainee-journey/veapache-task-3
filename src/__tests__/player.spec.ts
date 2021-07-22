@@ -1,20 +1,27 @@
 import prisma from "../client";
 import { createPlayer, getPlayer, getPlayers, updatePlayer, deletePlayer } from "../functions/players";
 
+const deletePlayerRecords = async () => {
+  await prisma.$transaction([
+    prisma.playerStat.deleteMany(),
+    prisma.player.deleteMany()
+  ]);
+}
 
-beforeAll(async () => {
-  const playerData = {
-    name: 'Voland',
-  }
+beforeEach(async () => {
+  await deletePlayerRecords();
+})
 
-  await createPlayer(playerData);
+afterAll(async () => {
+  await deletePlayerRecords();
+  await prisma.$disconnect();
 })
 
 test('should find player with id', async () => {
   const playerId = 666;
   
   const playerData = {
-    player_id: playerId,
+    id: playerId,
     name: 'Punk',
   }
 
@@ -22,14 +29,14 @@ test('should find player with id', async () => {
 
   const player = await getPlayer(playerId);
 
-  expect(player?.player_id).toEqual(playerId);
+  expect(player?.id).toEqual(playerId);
 })
 
 test('should find all players', async () => {
   const initialPlayers = await getPlayers();
 
   const playerData = {
-    player_id: 667,
+    id: 667,
     name: 'Bob'
   }
 
@@ -41,17 +48,49 @@ test('should find all players', async () => {
 })
 
 test('should create new player ', async () => {
+  const playerId = 322;
+
   const playerData = {
+    id: playerId,
     name: 'Demortovich',
   }
 
   const newPlayer = await createPlayer(playerData);
 
-  expect(newPlayer.name).toEqual(playerData.name);
+  const player = await getPlayer(newPlayer.id);
+
+  expect(player?.id).toEqual(playerId);
+})
+
+test('should create default player stats on player create', async () => {
+  const playerId = 2021;
+
+  const playerData = {
+    id: playerId,
+    name: 'KunaCoder',
+  }
+
+  const basePlayerStats = {
+    strength: 1,
+    magic: 1,
+    dexterity: 1,
+    vitality: 1,
+    life: 1,
+    mana: 1,
+  }
+
+  await createPlayer(playerData);
+
+  const player = await getPlayer(playerId);
+
+  expect(player?.playerStats).toMatchObject(basePlayerStats);
 })
 
 test('should update player ', async () => {
+  const playerId = 228;
+
   const playerData = {
+    id: playerId,
     name: 'Great player',
   }
 
@@ -61,16 +100,18 @@ test('should update player ', async () => {
     name: 'Ugly player'
   }
 
-  const updatedPlayer = await updatePlayer(newPlayer.player_id, updatePlayerData);
+  const updatedPlayer = await updatePlayer(newPlayer.id, updatePlayerData);
 
-  expect(updatedPlayer.name).toEqual(updatePlayerData.name);
+  const player = await getPlayer(updatedPlayer.id);
+
+  expect(player?.id).toEqual(playerId);
 })
 
 test('should delete player with id', async () => {
   const playerId = 777;
 
   const playerData = {
-    player_id: playerId,
+    id: playerId,
     name: 'Lucky Lucy',
   }
 
@@ -82,16 +123,3 @@ test('should delete player with id', async () => {
 
   expect(player).toEqual(null);
 })
-
-
-afterAll(async () => {
-  const deletePlayerStas = prisma.player_stats.deleteMany();
-  const deletePlayers = prisma.players.deleteMany();
-
-  await prisma.$transaction([
-    deletePlayerStas,
-    deletePlayers
-  ])
-
-  await prisma.$disconnect();
-});

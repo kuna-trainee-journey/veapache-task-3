@@ -1,42 +1,42 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import prisma from '../client';
 
-interface CreatePlayer {
+type CreatePlayer = {
   name: string
 }
 
-interface UpdatePlayer {
+type UpdatePlayer = {
   name: string
 }
 
 export async function getPlayers() {
-  return await prisma.players.findMany({
+  return prisma.player.findMany({
     include: {
-      player_stats: true,
-      player_skills: true,
-      player_weapons: true,
+      playerStats: true,
+      playerSkills: true,
+      playerWeapons: true,
     },
   })
 }
 
 export async function getPlayer(playerId: number) {
-  return await prisma.players.findUnique({
+  return prisma.player.findUnique({
     where: {
-      player_id: playerId,
+      id: playerId,
     },
     include: {
-      player_stats: true,
-      player_skills: true,
-      player_weapons: true,
+      playerStats: true,
+      playerSkills: true,
+      playerWeapons: true,
     },
   })
 }
 
 export async function createPlayer(player: CreatePlayer) {
-  return await prisma.players.create({
+  return prisma.player.create({
     data: {
       ...player,
-      player_stats: {
+      playerStats: {
         create: {}
       }
     }
@@ -44,18 +44,18 @@ export async function createPlayer(player: CreatePlayer) {
 }
 
 export async function updatePlayer(playerId: number, player: UpdatePlayer) {
-  return await prisma.players.update({
+  return prisma.player.update({
     where: {
-      player_id: playerId,
+      id: playerId,
     },
     data: player,
   })
 }
 
 export async function deletePlayer(playerId: number) {
-  return await prisma.players.delete({
+  return prisma.player.delete({
     where: {
-      player_id: playerId,
+      id: playerId,
     },
   })
 }
