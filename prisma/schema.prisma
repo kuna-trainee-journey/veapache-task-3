@@ -8,59 +8,59 @@ generator client {
   previewFeatures = ["referentialActions"]
 }
 
-model skills {
-  skill_id      Int     @default(autoincrement()) @id
+model Skill {
+  id            Int     @default(autoincrement()) @id
   name          String  @unique
   damage        Decimal
   cooldown      Decimal
-  mana_cost     Decimal
-  player_skills player_skills[]
+  manaCost      Decimal
+  PlayerSkills  PlayerSkill[]
 }
 
-model weapons {
-  weapon_id      Int     @default(autoincrement()) @id
-  name           String  @unique
-  damage         Decimal
-  attack_speed   Decimal
-  player_weapons player_weapons[]
+model Weapon {
+  id            Int     @default(autoincrement()) @id
+  name          String  @unique
+  damage        Decimal
+  attackSpeed   Decimal
+  PlayerWeapons PlayerWeapon[]
 }
 
-model player_skills {
-  player_id Int
-  skill_id  Int
-  players   players @relation(fields: [player_id], references: [player_id], onDelete: Cascade, onUpdate: Cascade)
-  skills    skills @relation(fields: [skill_id], references: [skill_id], onDelete: Cascade, onUpdate: Cascade)
+model PlayerSkill {
+  playerId Int
+  skillId  Int
+  Player   Player @relation(fields: [playerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  Skill    Skill  @relation(fields: [skillId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  @@unique([player_id, skill_id], name: "player_skill_id")
+  @@unique([playerId, skillId], name: "player_skill_id")
 }
 
-model player_weapons {
-  player_id Int
-  weapon_id Int
-  players   players @relation(fields: [player_id], references: [player_id], onDelete: Cascade, onUpdate: Cascade)
-  weapons   weapons @relation(fields: [weapon_id], references: [weapon_id], onDelete: Cascade, onUpdate: Cascade)
+model PlayerWeapon {
+  playerId Int
+  weaponId Int
+  Player   Player @relation(fields: [playerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  Weapon   Weapon @relation(fields: [weaponId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  @@unique([player_id, weapon_id], name: "player_weapon_id")
+  @@unique([playerId, weaponId], name: "player_weapon_id")
 }
 
-model player_stats {
-  player_stat_id Int     @default(autoincrement()) @id
-  player_id      Int     @unique
-  strength       Int
-  magic          Int
-  dexterity      Int
-  vitality       Int
-  life           Int
-  mana           Int
-  players        players @relation(fields: [player_id], references: [player_id], onDelete: Cascade, onUpdate: Cascade)
+model PlayerStat {
+  id             Int    @default(autoincrement()) @id
+  playerId       Int    @unique
+  strength       Int    @default(1)
+  magic          Int    @default(1)
+  dexterity      Int    @default(1)
+  vitality       Int    @default(1)
+  life           Int    @default(1)
+  mana           Int    @default(1)
+  Player         Player @relation(fields: [playerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
-model players {
-  player_id      Int              @default(autoincrement()) @id
-  name           String           @unique
-  level          Int
-  experience     Int
-  player_stats   player_stats?
-  player_skills  player_skills[]
-  player_weapons player_weapons[]
+model Player {
+  id            Int    @default(autoincrement()) @id
+  name          String @unique
+  level         Int    @default(0)
+  experience    Int    @default(0)
+  PlayerStats   PlayerStat?
+  PlayerSkills  PlayerSkill[]
+  PlayerWeapons PlayerWeapon[]
 }
