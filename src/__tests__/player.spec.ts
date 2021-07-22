@@ -1,5 +1,5 @@
 import prisma from "../client";
-import { createPlayer, getPlayer, getPlayers, updatePlayer, deletePlayer } from "../functions/players";
+import { createPlayer, getPlayer, getPlayers, updatePlayer, deletePlayer, getPlayerDetails } from "../functions/players";
 
 const deletePlayerRecords = async () => {
   await prisma.$transaction([
@@ -57,9 +57,16 @@ test('should create new player ', async () => {
 
   const newPlayer = await createPlayer(playerData);
 
+  const expectedPlayer = {
+    id: playerId,
+    name: 'Demortovich',
+    level: 0,
+    experience: 0
+  }
+
   const player = await getPlayer(newPlayer.id);
 
-  expect(player?.id).toEqual(playerId);
+  expect(expectedPlayer).toEqual(player);
 })
 
 test('should create default player stats on player create', async () => {
@@ -81,9 +88,9 @@ test('should create default player stats on player create', async () => {
 
   await createPlayer(playerData);
 
-  const player = await getPlayer(playerId);
+  const player = await getPlayerDetails(playerId);
 
-  expect(player?.playerStats).toMatchObject(basePlayerStats);
+  expect(player?.PlayerStats).toMatchObject(basePlayerStats);
 })
 
 test('should update player ', async () => {
@@ -104,7 +111,7 @@ test('should update player ', async () => {
 
   const player = await getPlayer(updatedPlayer.id);
 
-  expect(player?.id).toEqual(playerId);
+  expect(player).toEqual(updatedPlayer);
 })
 
 test('should delete player with id', async () => {

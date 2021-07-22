@@ -12,9 +12,9 @@ type UpdatePlayer = {
 export async function getPlayers() {
   return prisma.player.findMany({
     include: {
-      playerStats: true,
-      playerSkills: true,
-      playerWeapons: true,
+      PlayerStats: true,
+      PlayerSkills: true,
+      PlayerWeapons: true,
     },
   })
 }
@@ -24,10 +24,18 @@ export async function getPlayer(playerId: number) {
     where: {
       id: playerId,
     },
+  })
+}
+
+export async function getPlayerDetails(playerId: number) {
+  return prisma.player.findUnique({
+    where: {
+      id: playerId,
+    },
     include: {
-      playerStats: true,
-      playerSkills: true,
-      playerWeapons: true,
+      PlayerStats: true,
+      PlayerSkills: true,
+      PlayerWeapons: true,
     },
   })
 }
@@ -36,7 +44,7 @@ export async function createPlayer(player: CreatePlayer) {
   return prisma.player.create({
     data: {
       ...player,
-      playerStats: {
+      PlayerStats: {
         create: {}
       }
     }
